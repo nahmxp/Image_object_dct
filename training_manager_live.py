@@ -1,18 +1,9 @@
 import streamlit as st
 import os
 import glob
-import json
 import pandas as pd
 from datetime import datetime
 from ultralytics import YOLO
-import subprocess
-import threading
-import time
-import queue
-import re
-import sys
-from io import StringIO
-import contextlib
 
 # Page configuration
 st.set_page_config(
@@ -24,59 +15,14 @@ st.set_page_config(
 # Initialize session state
 if 'training_in_progress' not in st.session_state:
     st.session_state.training_in_progress = False
-if 'training_logs' not in st.session_state:
-    st.session_state.training_logs = []
 if 'selected_model' not in st.session_state:
     st.session_state.selected_model = None
 if 'models_data' not in st.session_state:
     st.session_state.models_data = []
-if 'training_thread' not in st.session_state:
-    st.session_state.training_thread = None
 if 'training_results' not in st.session_state:
     st.session_state.training_results = None
-if 'training_progress' not in st.session_state:
-    st.session_state.training_progress = {'epoch': 0, 'total_epochs': 0, 'loss': 0, 'metrics': {}}
 if 'selected_dataset_path' not in st.session_state:
     st.session_state.selected_dataset_path = "./yolov11/dataset.yaml"
-
-class TrainingLogger:
-    """Custom logger to capture training output"""
-    
-    def __init__(self):
-        self.logs = []
-        self.current_epoch = 0
-        self.total_epochs = 0
-        self.metrics = {}
-    
-    def log(self, message):
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        log_entry = f"[{timestamp}] {message}"
-        self.logs.append(log_entry)
-        
-        # Parse epoch information
-        epoch_match = re.search(r'(\d+)/(\d+)', message)
-        if epoch_match:
-            self.current_epoch = int(epoch_match.group(1))
-            self.total_epochs = int(epoch_match.group(2))
-        
-        # Parse metrics
-        if 'train/box_loss' in message:
-            try:
-                loss_match = re.search(r'train/box_loss:\s*([\d.]+)', message)
-                if loss_match:
-                    self.metrics['box_loss'] = float(loss_match.group(1))
-            except:
-                pass
-        
-        return log_entry
-    
-    def get_progress(self):
-        return {
-            'epoch': self.current_epoch,
-            'total_epochs': self.total_epochs,
-            'progress': self.current_epoch / max(self.total_epochs, 1),
-            'metrics': self.metrics.copy()
-        }
 
 class ModelManager:
     """Handles model discovery, analysis, and management"""
@@ -251,73 +197,26 @@ class ModelManager:
         
         return model_info
 
-def train_model_thread(model_path, config, logger):
-    """Training function to run in background thread"""
+def train_model_simple(model_path, config):
+    """Simple training function that works like train.py"""
     try:
         # Load model
         model = YOLO(model_path)
         
-        # Custom callback to capture training progress
-        def on_train_epoch_end(trainer):
-            epoch = trainer.epoch
-            epochs = trainer.epochs
-            
-            # Get metrics
-            metrics = {}
-            if hasattr(trainer, 'metrics') and trainer.metrics:
-                metrics = {
-                    'box_loss': trainer.loss.get('train/box_loss', 0),
-                    'cls_loss': trainer.loss.get('train/cls_loss', 0),
-                    'dfl_loss': trainer.loss.get('train/dfl_loss', 0),
-                }
-            
-            # Update progress
-            st.session_state.training_progress = {
-                'epoch': epoch + 1,
-                'total_epochs': epochs,
-                'progress': (epoch + 1) / epochs,
-                'metrics': metrics
-            }
-            
-            # Log progress
-            logger.log(f"Epoch {epoch + 1}/{epochs} completed - Loss: {metrics.get('box_loss', 'N/A')}")
-        
-        # Add callback
-        model.add_callback('on_train_epoch_end', on_train_epoch_end)
-        
-        logger.log("Starting training...")
-        logger.log(f"Model: {model_path}")
-        logger.log(f"Dataset: {config['data']}")
-        logger.log(f"Epochs: {config['epochs']}")
-        logger.log(f"Batch size: {config['batch']}")
-        
-        # Start training
+        # Start training (simple, no complex threading)
         results = model.train(**config)
         
-        logger.log("Training completed successfully!")
-        st.session_state.training_results = results
-        
-        return results
+        return results, None
         
     except Exception as e:
-        logger.log(f"Training failed: {str(e)}")
-        st.session_state.training_results = {"error": str(e)}
-        return None
-    finally:
-        st.session_state.training_in_progress = False
+        return None, str(e)
 
 # Initialize components
 model_manager = ModelManager(st.session_state.selected_dataset_path)
-training_logger = TrainingLogger()
 
 # Title and header
 st.title("🎯 YOLO Training Manager")
 st.markdown("### Manage, compare, and train YOLO models with ease")
-
-# Auto-refresh during training
-if st.session_state.training_in_progress:
-    time.sleep(2)
-    st.rerun()
 
 # Sidebar for refresh and settings
 with st.sidebar:
@@ -506,25 +405,31 @@ if st.session_state.selected_model:
                         'patience': train_patience,
                         'save': True,
                         'verbose': True,
-                        'amp': True
+                        'amp': True,
+                        'workers': 0  # Set to 0 for Windows compatibility
                     }
                     
-                    # Start training in background thread
                     st.session_state.training_in_progress = True
-                    st.session_state.training_progress = {'epoch': 0, 'total_epochs': train_epochs, 'progress': 0, 'metrics': {}}
-                    st.session_state.training_logs = []
+                    st.success("🎓 Training started! Please wait...")
                     
-                    # Start training thread
-                    training_thread = threading.Thread(
-                        target=train_model_thread,
-                        args=(selected_model_data['path'], training_config, training_logger)
-                    )
-                    training_thread.daemon = True
-                    training_thread.start()
-                    st.session_state.training_thread = training_thread
-                    
-                    st.success("🎓 Training started!")
-                    st.rerun()
+                    # Show training info
+                    with st.spinner("🔄 Training in progress..."):
+                        # Simple training execution
+                        results, error = train_model_simple(selected_model_data['path'], training_config)
+                        
+                        if error:
+                            st.error(f"❌ Training failed: {error}")
+                            st.session_state.training_in_progress = False
+                        else:
+                            st.success("✅ Training completed successfully!")
+                            st.session_state.training_results = results
+                            st.session_state.training_in_progress = False
+                            
+                            # Refresh models list
+                            st.session_state.models_data = model_manager.scan_models()
+                            st.info("🔄 Model list updated with new trained model")
+                            
+                            st.rerun()
             else:
                 st.warning("🔄 Training in progress...")
                 if st.button("⏹️ Stop Training", key="stop_training_btn"):
@@ -540,47 +445,12 @@ if st.session_state.selected_model:
     else:
         st.warning("⚠️ Model selection error - Please refresh and try again.")
 
-# Training progress display
+# Training status display
 if st.session_state.training_in_progress:
     st.markdown("---")
-    st.header("📊 Live Training Progress")
-    
-    # Progress metrics
-    progress_data = st.session_state.training_progress
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("Current Epoch", f"{progress_data['epoch']}/{progress_data['total_epochs']}")
-    
-    with col2:
-        progress_percent = progress_data.get('progress', 0) * 100
-        st.metric("Progress", f"{progress_percent:.1f}%")
-    
-    with col3:
-        if 'box_loss' in progress_data['metrics']:
-            st.metric("Box Loss", f"{progress_data['metrics']['box_loss']:.4f}")
-    
-    with col4:
-        if 'cls_loss' in progress_data['metrics']:
-            st.metric("Class Loss", f"{progress_data['metrics']['cls_loss']:.4f}")
-    
-    # Progress bar
-    if progress_data['total_epochs'] > 0:
-        st.progress(progress_data['progress'])
-    
-    # Live logs
-    st.subheader("📝 Training Logs")
-    log_container = st.container()
-    
-    with log_container:
-        if training_logger.logs:
-            # Show last 20 logs
-            recent_logs = training_logger.logs[-20:]
-            for log in recent_logs:
-                st.text(log)
-        else:
-            st.info("Waiting for training logs...")
+    st.header("� Training in Progress")
+    st.info("Training is running... This may take a while depending on your configuration.")
+    st.warning("Please do not close this window while training is in progress.")
 
 # Training completion handling
 if st.session_state.training_results and not st.session_state.training_in_progress:

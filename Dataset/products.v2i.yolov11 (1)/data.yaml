@@ -1,0 +1,16 @@
+# train: ../train/images
+# val: ../valid/images
+# test: ../test/images
+path: ./Dataset/products.v2i.yolov11 (1)
+train: train
+val: val
+test: test
+nc: 7
+names: ['Boro Plus Antiseptic Moisturising Soap', 'Emami 7 oils in one', 'Garnier Men turbo face wash', 'He Perfume', 'Himalaya Men face wash', 'navratna oil bottle', 'navratna oil box']
+
+roboflow:
+  workspace: noortaz
+  project: products-lyt8r
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/noortaz/products-lyt8r/dataset/2
