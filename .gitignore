@@ -39,12 +39,14 @@ Model/
 models/
 
 # Dataset Files (Large Files)
-Dataset/products.v2i.yolov11 (1)/train/images/
-Dataset/products.v2i.yolov11 (1)/train/labels/ 
-Dataset/products.v2i.yolov11 (1)/val/images/
-Dataset/products.v2i.yolov11 (1)/val/labels/
-Dataset/products.v2i.yolov11 (1)/test/images/
-Dataset/products.v2i.yolov11 (1)/test/labels/
+Dataset/products.v2i.yolov11*/train/images/
+Dataset/products.v2i.yolov11*/train/labels/ 
+Dataset/products.v2i.yolov11*/val/images/
+Dataset/products.v2i.yolov11*/val/labels/
+Dataset/products.v2i.yolov11*/valid/images/
+Dataset/products.v2i.yolov11*/valid/labels/
+Dataset/products.v2i.yolov11*/test/images/
+Dataset/products.v2i.yolov11*/test/labels/
 Dataset/yolov11/train/images/
 Dataset/yolov11/train/labels/
 Dataset/yolov11/val/images/
@@ -95,6 +97,8 @@ Thumbs.db
 # Allow essential config files
 !Dataset/yolov11/dataset.yaml
 !Dataset/yolov11/classes.txt
+!Dataset/products.v2i.yolov11*/data.yaml
+!Dataset/products.v2i.yolov11*/README*.txt
 
 # Large media files
 *.mp4
