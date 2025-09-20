@@ -1,0 +1,10 @@
+# YOLO dataset config
+path: ./Dataset/yolov11
+train: train
+val: val
+test: test
+
+
+nc: 2
+names: ['7 OILS IN ONE 100 ML', 'BORO PLUS ANTIBACTERIAL SOAP 100 GM']
+# task: segment

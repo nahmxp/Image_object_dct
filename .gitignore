@@ -1,0 +1,114 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# PyTorch/YOLO Models (Large Files)
+*.pt
+*.pth
+*.onnx
+*.engine
+*.trt
+Model/
+models/
+
+# Dataset Files (Large Files)
+Dataset/yolov11/train/images/
+Dataset/yolov11/train/labels/
+Dataset/yolov11/val/images/
+Dataset/yolov11/val/labels/
+Dataset/yolov11/test/images/
+Dataset/yolov11/test/labels/
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tiff
+*.webp
+*.cache
+
+# Training Results and Outputs
+runs/
+results/
+wandb/
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Data files
+*.csv
+*.json
+*.xml
+*.yaml.bak
+*.yml.bak
+
+# Allow essential config files
+!Dataset/yolov11/dataset.yaml
+!Dataset/yolov11/classes.txt
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# CUDA cache
+.nv/
