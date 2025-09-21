@@ -1,236 +1,362 @@
-# 🎯 YOLO Object Detection Project
+# 🎯 YOLO Object Detection System
 
-A comprehensive YOLO-based object detection system for detecting and classifying cosmetic products with multiple training interfaces, real-time detection capabilities, and advanced model management.
+A comprehensive YOLO-based object detection system with multiple training interfaces, real-time detection capabilities, and dataset management tools.
 
-## 📋 Project Overview
-
-This project implements YOLOv11 object detection to identify specific cosmetic products:
-- **"7 OILS IN ONE 100 ML"** - Hair oil products
-- **"BORO PLUS ANTIBACTERIAL SOAP 100 GM"** - Soap products
-
-The system includes multiple interfaces for training, testing, and real-time detection with comprehensive model management capabilities.
-
-## 🏗️ Project Architecture
+## � Project Structure
 
 ```
-Image_object_dct/
-├── 📝 Training Scripts
-│   ├── train.py                    # Basic training script (original)
-│   ├── smart_train.py             # Intelligent training with auto-resume
-│   ├── training_manager.py        # Streamlit training interface (basic)
-│   └── training_manager_live.py   # Advanced live training manager
-├── 🎯 Detection & Testing
-│   ├── test_detection.py          # Simple image upload testing interface
-│   └── app.py                     # Full-featured detection app (camera + upload)
-├── 📊 Data & Models
-│   ├── Dataset/yolov11/           # Dataset configuration and structure
-│   ├── Model/                     # Pre-trained base models
-│   └── runs/detect/               # Training results and fine-tuned models
-├── 🔧 Configuration
-│   ├── .gitignore                 # Git ignore rules
-│   ├── requirements.txt           # Python dependencies (if exists)
-│   └── README.md                  # This documentation
-└── 🐍 Python Environment
-    └── venv/                      # Virtual environment
+E:\NDEV\Image_object_dct\
+├── 📄 Python Scripts (.py files)
+├── 📂 Dataset/                    # Training datasets (ignored in git)
+├── 📂 Model/                      # Pre-trained models (ignored in git)
+├── 📂 runs/                       # Training outputs (ignored in git)
+├── 📂 tools/                      # Utility scripts
+└── 📋 README.md                   # This file
 ```
 
-## ⚡ Quick Start
+## 🐍 Python Files Overview
 
-### 1. 🔧 Environment Setup
+### 🎯 **Core Training Scripts**
 
-```powershell
-# Clone the repository
-git clone <repository-url>
-cd Image_object_dct
-
-# Create and activate virtual environment
-python -m venv venv
-.\venv\Scripts\Activate  # Windows PowerShell
-
-# Install dependencies
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu129
-pip install ultralytics streamlit opencv-python pillow
+#### 1. **`train.py`** - Basic Training Script
+**Purpose:** Simple YOLO model training with minimal configuration
+```python
+# Basic YOLO training
+from ultralytics import YOLO
+model = YOLO("./Model/yolo11x-seg.pt")
+model.train(data="./Dataset/YOLO/yolov11/dataset.yaml", epochs=100)
 ```
-
-### 2. 📊 Dataset Structure
-
-Ensure your dataset follows this structure:
-```
-Dataset/yolov11/
-├── dataset.yaml          # YOLO configuration file
-├── classes.txt          # Class names
-├── train/               # Training images and labels
-│   ├── images/
-│   └── labels/
-├── val/                 # Validation images and labels
-│   ├── images/
-│   └── labels/
-└── test/                # Test images and labels
-    ├── images/
-    └── labels/
-```
-
-### 3. 🎯 Base Model Setup
-
-Place your base YOLO model in:
-```
-Model/yolo11x.pt         # Pre-trained YOLOv11 model
-```
-
-## 🚀 Usage Guide
-
-### 🔥 Method 1: Smart Training (Recommended)
-
-**Auto-detects latest model and resumes training:**
-
-```powershell
-python smart_train.py
-```
-
-**Features:**
-- ✅ Automatically finds latest fine-tuned model
-- ✅ Falls back to base model if none exists
-- ✅ Intelligent model selection
-- ✅ Enhanced error handling
-
-### 🎮 Method 2: Live Training Manager (Most Advanced)
-
-**Complete training management interface:**
-
-```powershell
-streamlit run training_manager_live.py
-```
-
-**Features:**
-- 📚 **Model Browser**: View all available models with metrics
-- 🔍 **Performance Comparison**: Compare mAP, precision, recall
-- ⚙️ **Training Configuration**: Customize epochs, batch size, device
-- 📊 **Real-time Monitoring**: Live progress bars and metrics
-- 🔄 **Background Training**: Non-blocking interface
-- 📝 **Live Logs**: Stream training output in real-time
-- ✅ **Auto-refresh**: Updates model list after training
-
-### 🧪 Method 3: Simple Image Testing
-
-**Quick model testing interface:**
-
-```powershell
-streamlit run test_detection.py
-```
-
-**Features:**
-- 📁 **Easy Upload**: Drag & drop image testing
-- 🎚️ **Confidence Control**: Adjustable detection threshold
-- 📊 **Detailed Results**: Object counts and confidence scores
-- 👀 **Side-by-side View**: Original vs detected image
-
-### 📹 Method 4: Full Detection App
-
-**Complete detection system with camera:**
-
-```powershell
-streamlit run app.py
-```
-
-**Features:**
-- 📹 **Live Camera**: Real-time webcam detection
-- 🖼️ **Image Upload**: Single image analysis
-- 🎬 **Video Processing**: Batch video analysis
-- 🎛️ **Controls**: Start/stop camera, confidence adjustment
-
-### 📝 Method 5: Basic Training
-
-**Simple command-line training:**
-
-```powershell
+**Usage:**
+```bash
 python train.py
 ```
 
-## 🔗 File Connections & Dependencies
+#### 2. **`smart_train.py`** - Intelligent Auto-Resume Training
+**Purpose:** Advanced training with automatic resume, model comparison, and performance tracking
+- ✅ Auto-detects and resumes interrupted training
+- ✅ Compares multiple model performances
+- ✅ Smart model selection and validation
+- ✅ Comprehensive logging and monitoring
 
-### 📊 Data Flow Architecture
-
-```mermaid
-graph TD
-    A[Dataset/yolov11/] --> B[train.py]
-    A --> C[smart_train.py]
-    A --> D[training_manager_live.py]
-    
-    E[Model/yolo11x.pt] --> B
-    E --> C
-    E --> D
-    
-    F[runs/detect/train*/weights/] --> C
-    F --> D
-    F --> G[test_detection.py]
-    F --> H[app.py]
-    
-    B --> I[New Model in runs/]
-    C --> I
-    D --> I
-    
-    I --> G
-    I --> H
+**Usage:**
+```bash
+python smart_train.py
 ```
 
-### 🔧 Component Relationships
+### 🎛️ **Training Management Interfaces**
 
-#### **Training Pipeline:**
-1. **`train.py`** → Basic training → **`runs/detect/train/`**
-2. **`smart_train.py`** → Auto-resume → **`runs/detect/train2/`**
-3. **`training_manager_live.py`** → GUI training → **`runs/detect/train3/`**
+#### 3. **`training_manager.py`** - Basic Training GUI
+**Purpose:** Simple Streamlit interface for model training management
+- 📊 Model browser and selection
+- ⚙️ Basic training configuration
+- 🎯 Simple training execution
 
-#### **Detection Pipeline:**
-1. **Models** (`Model/` + `runs/detect/*/weights/`) → **Detection Apps**
-2. **`test_detection.py`** → Image upload → **Results**
-3. **`app.py`** → Multi-modal detection → **Real-time results**
-
-#### **Configuration Chain:**
-- **`Dataset/yolov11/dataset.yaml`** → Defines data paths
-- **Training scripts** → Read dataset.yaml → **Model training**
-- **Detection apps** → Load trained models → **Inference**
-
-## 🎛️ Configuration Files
-
-### 📄 dataset.yaml
-```yaml
-# YOLO dataset configuration
-path: ./yolov11                    # Dataset root
-train: train                      # Training subset
-val: val                         # Validation subset  
-test: test                       # Test subset
-
-nc: 2                            # Number of classes
-names: ['7 OILS IN ONE 100 ML', 'BORO PLUS ANTIBACTERIAL SOAP 100 GM']
+**Usage:**
+```bash
+streamlit run training_manager.py
 ```
 
-### 🎯 Training Parameters
+#### 4. **`training_manager_live.py`** - Advanced Training Manager
+**Purpose:** Advanced Streamlit interface with real-time monitoring
+- 📊 Live training progress tracking
+- 📈 Real-time metrics visualization
+- 🔄 Advanced model comparison
+- 📋 Comprehensive training logs
 
-**Default Configuration:**
-- **Image Size**: 640x640
-- **Batch Size**: 8
-- **Epochs**: 100
-- **Device**: GPU (0) / CPU
-- **Workers**: 0 (Windows compatibility)
-- **Patience**: 50 (early stopping)
-
-## 📊 Model Management
-
-### 🏆 Model Hierarchy
-
-1. **Base Model**: `Model/yolo11x.pt` (Pre-trained)
-2. **Fine-tuned Models**: `runs/detect/train*/weights/`
-   - **`best.pt`**: Best performing checkpoint
-   - **`last.pt`**: Latest training checkpoint
-
-### 🔄 Auto-Resume Logic
-
-```python
-Priority Order:
-1. Latest fine-tuned model (newest best.pt)
-2. Base model (yolo11x.pt)
-3. Error if nothing found
+**Usage:**
+```bash
+streamlit run training_manager_live.py
 ```
+
+#### 5. **`training_manager_simple.py`** - Enhanced Simple Manager
+**Purpose:** Streamlined training interface with dataset browsing
+- 📁 File browser for dataset selection
+- ✅ Dataset validation and verification
+- 🎯 Simplified training workflow
+- 🔄 Auto-refresh model list
+
+**Usage:**
+```bash
+streamlit run training_manager_simple.py
+```
+
+### 🔍 **Detection Applications**
+
+#### 6. **`test_detection.py`** - Image Testing Interface
+**Purpose:** Simple image upload and detection testing
+- � Image upload functionality
+- 🎯 Quick detection testing
+- 📊 Results visualization
+- 💾 Save detection results
+
+**Usage:**
+```bash
+streamlit run test_detection.py
+```
+
+#### 7. **`app.py`** - Full Detection Application
+**Purpose:** Comprehensive detection system with multiple input sources
+- 📷 Real-time camera detection
+- 📤 Image upload and batch processing
+- 🎥 Video file processing
+- � Advanced visualization options
+- 💾 Export and save capabilities
+
+**Usage:**
+```bash
+streamlit run app.py
+```
+
+#### 8. **`camera.py`** - Real-time Camera Detection
+**Purpose:** Dedicated webcam real-time object detection
+- 📷 Live webcam feed processing
+- 🎯 Real-time YOLO inference
+- 📊 Live bounding box visualization
+- ⚙️ Configurable model selection
+
+**Usage:**
+```bash
+streamlit run camera.py
+```
+### 🛠️ **Utility Scripts**
+
+#### 9. **`tools/augment_yolov11.py`** - Dataset Augmentation Tool
+**Purpose:** Advanced dataset augmentation for YOLO training
+- 🔄 Multiple augmentation techniques (flip, rotate, shear, noise)
+- 📊 YOLO label preservation and transformation
+- 📁 Batch processing capabilities
+- ⚙️ Configurable augmentation parameters
+
+**Features:**
+- Horizontal/Vertical flips
+- 90° rotations (clockwise, counter-clockwise, upside down)
+- Small angle rotations (±7°)
+- Shear transformations (±10° H/V)
+- Grayscale conversion (15% of images)
+- Noise addition (Gaussian + Salt&Pepper)
+- Automatic resize to 640×640
+
+**Usage:**
+```bash
+python tools/augment_yolov11.py --dataset-yaml "./Dataset/YOLO/yolov11/dataset.yaml" --out-root "./Dataset/YOLO/yolov11_aug" --include-original
+```
+
+## 📦 Dependencies & Installation
+
+### **System Requirements**
+- **Python:** 3.8+ (Tested on 3.12)
+- **CUDA:** Compatible GPU (RTX 4060 Ti recommended)
+- **RAM:** 8GB+ (16GB recommended)
+- **Storage:** 10GB+ free space
+
+### **Required Dependencies**
+
+#### **Core ML Libraries**
+```bash
+pip install ultralytics torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+#### **Computer Vision & Image Processing**
+```bash
+pip install opencv-python opencv-python-headless pillow
+```
+
+#### **Data Science & Visualization**
+```bash
+pip install numpy pandas matplotlib seaborn plotly
+```
+
+#### **Web Interface (Streamlit)**
+```bash
+pip install streamlit streamlit-webrtc
+```
+
+#### **Data Augmentation**
+```bash
+pip install albumentations
+```
+
+#### **Utilities**
+```bash
+pip install pyyaml tqdm psutil
+```
+
+### **One-Command Installation**
+```bash
+pip install ultralytics torch torchvision torchaudio opencv-python pillow numpy pandas matplotlib seaborn plotly streamlit streamlit-webrtc albumentations pyyaml tqdm psutil --index-url https://download.pytorch.org/whl/cu118
+```
+
+## 🚀 Quick Start Guide
+
+### **1. Environment Setup**
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd Image_object_dct
+
+# Create virtual environment
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### **2. Dataset Preparation**
+```bash
+# Your dataset should follow this structure:
+Dataset/
+├── YOLO/yolov11/
+│   ├── data.yaml          # Dataset configuration
+│   ├── train/
+│   │   ├── images/        # Training images
+│   │   └── labels/        # YOLO format labels
+│   ├── val/
+│   │   ├── images/        # Validation images
+│   │   └── labels/        # YOLO format labels
+│   └── test/              # Optional test set
+```
+
+### **3. Model Setup**
+```bash
+# Download YOLO models (will be downloaded automatically on first run)
+# Models are saved in: ./Model/
+```
+
+### **4. Usage Examples**
+
+#### **Basic Training**
+```bash
+python train.py
+```
+
+#### **Smart Training with Auto-Resume**
+```bash
+python smart_train.py
+```
+
+#### **GUI Training Manager**
+```bash
+streamlit run training_manager_simple.py
+```
+
+#### **Real-time Detection**
+```bash
+streamlit run camera.py
+```
+
+#### **Full Detection App**
+```bash
+streamlit run app.py
+```
+
+#### **Dataset Augmentation**
+```bash
+python tools/augment_yolov11.py --dataset-yaml "./Dataset/YOLO/yolov11/dataset.yaml" --out-root "./Dataset/YOLO/yolov11_aug"
+```
+
+## 🎯 Workflow Recommendations
+
+### **For Beginners:**
+1. **Start with:** `training_manager_simple.py` - Easy GUI interface
+2. **Test models:** `test_detection.py` - Simple image testing
+3. **Real-time:** `camera.py` - Webcam detection
+
+### **For Advanced Users:**
+1. **Training:** `smart_train.py` - Auto-resume and comparison
+2. **Monitoring:** `training_manager_live.py` - Real-time progress
+3. **Production:** `app.py` - Full-featured detection system
+
+### **For Dataset Management:**
+1. **Augmentation:** `tools/augment_yolov11.py` - Expand dataset
+2. **Training:** Any training script with augmented data
+3. **Validation:** Compare models with original vs augmented datasets
+
+## ⚙️ Configuration
+
+### **Training Parameters (Common)**
+- **Image Size:** 640x640 (adjustable)
+- **Batch Size:** 8 (reduce if memory issues)
+- **Epochs:** 100 (increase for better accuracy)
+- **Workers:** 0 (Windows) / 4 (Linux) for data loading
+
+### **Model Options**
+- **YOLOv11n:** Fastest, lowest accuracy
+- **YOLOv11s:** Balanced speed/accuracy
+- **YOLOv11m:** Medium size, good accuracy
+- **YOLOv11l:** Large, high accuracy
+- **YOLOv11x:** Largest, highest accuracy
+
+## 🔧 Troubleshooting
+
+### **Common Issues**
+1. **CUDA not available:** Install CUDA-compatible PyTorch
+2. **Memory errors:** Reduce batch size or image size
+3. **Multiprocessing errors (Windows):** Set `workers=0`
+4. **Streamlit port busy:** Use `--server.port 8502`
+
+### **Performance Tips**
+- Use GPU for training (`device=0`)
+- Monitor GPU memory usage
+- Use appropriate batch size for your GPU
+- Consider mixed precision training (enabled by default)
+
+## 📊 Output Structure
+
+```
+runs/
+├── detect/               # Object detection results
+│   ├── train*/          # Training sessions
+│   └── predict*/        # Prediction results
+└── segment/              # Segmentation results (if using -seg models)
+    ├── train*/          # Training sessions
+    └── predict*/        # Prediction results
+```
+
+## 🎯 Dataset Classes
+
+### **Current Project Supports:**
+
+#### **Main Products (7 classes):**
+- Boro Plus Antiseptic Moisturising Soap
+- Emami 7 oils in one
+- Garnier Men turbo face wash
+- He Perfume
+- Himalaya Men face wash
+- navratna oil bottle
+- navratna oil box
+
+#### **Additional Product Classes (4 classes):**
+- Fogg Absolute
+- Fogg Dynamic
+- Fogg Extreme
+- Fogg Punch
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- **Ultralytics YOLO** - Core detection framework
+- **Streamlit** - Web interface framework
+- **OpenCV** - Computer vision operations
+- **Albumentations** - Data augmentation library
+
+---
+
+**🎯 Ready to detect objects? Start with `streamlit run training_manager_simple.py` for the easiest experience!**
+
+
 
 ## 🎯 Interface Comparison
 

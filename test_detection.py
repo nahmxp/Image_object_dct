@@ -19,7 +19,7 @@ st.markdown("### Upload an image to test your trained YOLO model")
 # Load model
 @st.cache_resource
 def load_model():
-    model_path = "runs/detect/train/weights/best.pt"
+    model_path = "runs/segment/train6/weights/best.pt"
     if os.path.exists(model_path):
         model = YOLO(model_path)
         st.success(f"✅ Model loaded successfully!")

@@ -1,4 +1,18 @@
-# Python
+# ================================
+# YOLO Object Detection .gitignore
+# Only track .py files and documentation
+# ================================
+
+# Virtual Environments - CRITICAL to exclude
+venv/
+env/
+ENV/
+.venv/
+.env/
+env.bak/
+venv.bak/
+
+# Python Cache & Build Files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -22,59 +36,62 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
-venv/
-env/
-ENV/
-.venv/
-.env/
-
-# PyTorch/YOLO Models (Large Files)
+# ML & Training Files - Exclude all dataset and model files
+Dataset/
+dataset/
+data/
 *.pt
-*.pth
 *.onnx
 *.engine
-*.trt
-Model/
+*.wts
+runs/
+wandb/
+.neptune/
+mlruns/
+results/
+weights/
 models/
+model/
+checkpoints/
+checkpoint/
 
-# Dataset Files (Large Files)
-Dataset/products.v2i.yolov11*/train/images/
-Dataset/products.v2i.yolov11*/train/labels/ 
-Dataset/products.v2i.yolov11*/val/images/
-Dataset/products.v2i.yolov11*/val/labels/
-Dataset/products.v2i.yolov11*/valid/images/
-Dataset/products.v2i.yolov11*/valid/labels/
-Dataset/products.v2i.yolov11*/test/images/
-Dataset/products.v2i.yolov11*/test/labels/
-Dataset/yolov11/train/images/
-Dataset/yolov11/train/labels/
-Dataset/yolov11/val/images/
-Dataset/yolov11/val/labels/
-Dataset/yolov11/test/images/
-Dataset/yolov11/test/labels/
+# Media Files - Images, videos etc
+*.mp4
+*.avi
+*.mov
+*.mkv
 *.jpg
 *.jpeg
 *.png
+*.gif
 *.bmp
 *.tiff
 *.webp
-*.cache
 
-# Training Results and Outputs
-runs/
-results/
-wandb/
+# Configuration Files (except requirements.txt)
+*.yaml
+*.yml
+*.json
+config/
+configs/
+*.toml
+*.cfg
+*.ini
+*.conf
+
+# Log Files
+*.log
 logs/
+# Note: requirements.txt is allowed below
 
-# IDE
+# IDE Files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# OS Generated Files
 .DS_Store
 .DS_Store?
 ._*
@@ -87,38 +104,31 @@ Thumbs.db
 .ipynb_checkpoints/
 *.ipynb
 
-# Data files
-*.csv
-*.json
-*.xml
-*.yaml.bak
-*.yml.bak
+# Temporary Files
+*.tmp
+*.temp
+temp/
+tmp/
 
-# Allow essential config files
-!Dataset/yolov11/dataset.yaml
-!Dataset/yolov11/classes.txt
-!Dataset/products.v2i.yolov11*/data.yaml
-!Dataset/products.v2i.yolov11*/README*.txt
-
-# Large media files
-*.mp4
-*.avi
-*.mov
-*.mkv
-*.wmv
-*.flv
-*.webm
-
-# Compressed files
+# Archives
 *.zip
 *.tar.gz
 *.rar
 *.7z
 
-# Temporary files
-*.tmp
-*.temp
-*.log
+# Additional Model & Data Patterns
+*.h5
+*.hdf5
+*.pickle
+*.pkl
+*.pth
+*.safetensors
 
-# CUDA cache
-.nv/
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
